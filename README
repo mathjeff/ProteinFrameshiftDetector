@@ -1,0 +1,8 @@
+ProteinFrameshiftDetector is a prototype project for finding a single small frameshift that explains the difference between a DNA sequence and a protein sequence
+
+To use it, do this:
+
+```
+./gradlew build
+java -jar build/libs/ProteinFrameshiftDetector.jar <DNASequence> <ProteinSequence>
+```
