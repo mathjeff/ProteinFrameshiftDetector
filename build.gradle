@@ -5,7 +5,7 @@ compileJava {
   targetCompatibility = 1.8
 }
 
-String mainClass = "ProteinFrameshiftDetector.Main"
+String mainClass = "FrameshiftDetector.Main"
 
 jar {
   manifest {
