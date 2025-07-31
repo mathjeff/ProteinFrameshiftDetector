@@ -1,3 +1,7 @@
+plugins {
+  id "com.gradleup.shadow" version "8.3.0"
+}
+
 apply plugin: "java"
 
 compileJava {
@@ -15,7 +19,12 @@ jar {
 
 dependencies {
   testImplementation "junit:junit:4.13"
+  def mapperJar = project.files("./mapper/build/libs/x-mapper.jar")
+  implementation(mapperJar)
+  runtimeOnly(mapperJar)
 }
+
+tasks["compileJava"].dependsOn(gradle.includedBuild("mapper").task(":assemble"))
 
 repositories {
   mavenCentral()
