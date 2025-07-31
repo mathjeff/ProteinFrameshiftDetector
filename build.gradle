@@ -1,0 +1,22 @@
+apply plugin: "java"
+
+compileJava {
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+}
+
+String mainClass = "ProteinFrameshiftDetector.Main"
+
+jar {
+  manifest {
+    attributes 'Main-Class': mainClass
+  }
+}
+
+dependencies {
+  testImplementation "junit:junit:4.13"
+}
+
+repositories {
+  mavenCentral()
+}
