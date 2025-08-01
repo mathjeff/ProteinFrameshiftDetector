@@ -146,6 +146,13 @@ public class Main {
   }
 
   private static double compareProteins(String a, String b) {
+    if (a.length() < b.length())
+      return hashCompareProteins(a, b);
+    else
+      return hashCompareProteins(b, a);
+  }
+
+  private static double hashCompareProteins(String a, String b) {
     int numMatches = 0;
     int numMismatches = 0;
     int kmerLength = getKmerLength(b);
