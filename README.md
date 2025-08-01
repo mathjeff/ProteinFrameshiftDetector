@@ -3,7 +3,7 @@ ProteinFrameshiftDetector is a prototype project for finding a single small fram
 To use it, do this:
 
 ```
-java -jar build/libs/ProteinFrameshiftDetector.jar <DNASequence> <ProteinSequence>
+java -jar ProteinFrameshiftDetector.jar <DNASequence> <ProteinSequence>
 ```
 
 To get it, do one of these:
