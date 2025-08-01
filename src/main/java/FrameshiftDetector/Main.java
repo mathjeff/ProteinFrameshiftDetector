@@ -6,15 +6,36 @@ import java.util.List;
 import java.util.Set;
 
 public class Main {
+  private static void usage(String error) {
+    System.out.println(error);
+    System.out.println("Usage: java -jar ProteinFrameshiftDetector.jar <dna> <protein>");
+    System.exit(1);
+  }
+
   public static void main(String[] args) {
-    if (args.length != 2) {
-      System.out.println("Usage: java -jar ProteinFrameshiftDetector.jar <dna> <protein>");
-      System.exit(1);
+    List<String> dnas = new ArrayList<String>();
+    List<String> proteins = new ArrayList<String>();
+    for (int i = 0; i < args.length; i++) {
+      String arg = args[i];
+      if (arg.equals("--dna")) {
+        i++;
+        dnas.add(args[i]);
+        continue;
+      }
+      if (arg.equals("--protein")) {
+        i++;
+        proteins.add(args[i]);
+        continue;
+      }
+      usage("Unrecognized argument '" + arg + "', expected --dna or --protein");
     }
-    String dna = args[0];
-    String protein = args[1];
     System.out.println("\nThis program isn't optimized but hopefully is helpful\n");
-    process(dna, protein);
+    for (String protein: proteins) {
+      for (String dna: dnas) {
+        System.out.println("Comparing " + dna + " and " + protein);
+        process(dna, protein);
+      }
+    }
   }
 
   private static void process(String dna, String protein) {
