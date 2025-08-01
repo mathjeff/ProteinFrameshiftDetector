@@ -66,11 +66,11 @@ public class Main {
     int bestInsertionLength = 0;
     String bestMutatedDNA = "";
     double bestSimilarity = 0;
-    for (int insertionIndex = 0; insertionIndex < dna.length() - 3; insertionIndex++) {
-      for (int insertionLength = -2; insertionLength <= 2; insertionLength++) {
-        if (insertionLength == 0 && insertionIndex > 0) {
-          continue;
-        }
+    for (int insertionLength = -2; insertionLength <= 2; insertionLength++) {
+      int minIndex = Math.max(insertionLength, 2);
+      int maxIndex = Math.min(dna.length() - insertionLength, dna.length());
+
+      for (int insertionIndex = minIndex; insertionIndex < maxIndex; insertionIndex++) {
         if (insertionIndex + insertionLength < 0) {
           continue;
         }
@@ -98,6 +98,7 @@ public class Main {
     System.out.println("Translated  : " + dnaToProtein(bestMutatedDNA));
     System.out.println("Protein     : " + protein);
   }
+
 
   // adds an insertion of <insertionLength> at position <index>
   // If <insertionLength> is negative, creates a deletion instead
