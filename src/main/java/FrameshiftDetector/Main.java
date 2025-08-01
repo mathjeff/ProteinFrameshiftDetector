@@ -66,28 +66,44 @@ public class Main {
     int bestInsertionLength = 0;
     String bestMutatedDNA = "";
     double bestSimilarity = 0;
+    // check each possible frameshift
     for (int insertionLength = -2; insertionLength <= 2; insertionLength++) {
       int minIndex = Math.max(insertionLength, 2);
       int maxIndex = Math.min(dna.length() - insertionLength, dna.length());
 
-      for (int insertionIndex = minIndex; insertionIndex < maxIndex; insertionIndex++) {
-        if (insertionIndex + insertionLength < 0) {
-          continue;
+      String shiftedLow = addFrameshift(dna, minIndex, insertionLength);
+      String translatedLow = dnaToProtein(shiftedLow);
+      double similarityLow = compareProteins(protein, translatedLow);
+
+      String shiftedHigh = addFrameshift(dna, maxIndex, insertionLength);
+      String translatedHigh = dnaToProtein(shiftedHigh);
+      double similarityHigh = compareProteins(protein, translatedHigh);
+
+      // binary search to find the best position to put this frameshift
+      while (maxIndex > minIndex + 1) {
+        int middleIndex = (maxIndex + minIndex) / 2;
+
+        String shiftedMiddle = addFrameshift(dna, middleIndex, insertionLength);
+        String translatedMiddle = dnaToProtein(shiftedMiddle);
+        double similarityMiddle = compareProteins(protein, translatedMiddle);
+
+        if (similarityLow < similarityHigh) {
+          minIndex = middleIndex;
+          shiftedLow = shiftedMiddle;
+          translatedLow = translatedMiddle;
+          similarityLow = similarityMiddle;
+        } else {
+          minIndex = middleIndex;
+          shiftedHigh = shiftedMiddle;
+          translatedHigh = translatedMiddle;
+          similarityHigh = similarityMiddle;
         }
-        if (insertionIndex + insertionLength >= dna.length()) {
-          continue;
-        }
-        String shifted = addFrameshift(dna, insertionIndex, insertionLength);
-        //System.out.println("Checking frameshift of " + insertionLength + " at " + insertionIndex + " = " + shifted);
-        String translated = dnaToProtein(shifted);
-        //System.out.println("Translated to " + translated);
-        double similarity = compareProteins(protein, translated);
-        //System.out.println("Similarity = " + similarity);
-        if (similarity > bestSimilarity) {
-          bestSimilarity = similarity;
-          bestInsertionIndex = insertionIndex;
+
+        if (similarityMiddle > bestSimilarity) {
+          bestSimilarity = similarityMiddle;
+          bestInsertionIndex = middleIndex;
           bestInsertionLength = insertionLength;
-          bestMutatedDNA = shifted;
+          bestMutatedDNA = shiftedMiddle;
         }
       }
     }
