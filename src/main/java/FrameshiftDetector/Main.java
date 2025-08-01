@@ -59,12 +59,12 @@ public class Main {
         String dna = dnas.get(j);
         System.out.println("");
         System.out.println("Comparing dnas[" + i + "] and proteins[" + j + "]");
-        process(dna, protein);
+        process(dna, j, protein, i);
       }
     }
   }
 
-  private static void process(String dna, String protein) {
+  private static void process(String dna, int dnaIndex, String protein, int proteinIndex) {
     int bestInsertionIndex = 0;
     int bestInsertionLength = 0;
     String bestMutatedDNA = "";
@@ -115,7 +115,7 @@ public class Main {
     String translatedProtein = dnaToProtein(bestMutatedDNA);
     double bestSimilarity = Math.pow(kmerMatchRate, 1.0 / (double)getKmerLength(protein, translatedProtein));
 
-    System.out.println("Most similar result for this pair of DNA and protein is a frameshift of length " + bestInsertionLength + " at " + bestInsertionIndex + " with similarity of about " + bestSimilarity);
+    System.out.println("Most similar result for DNA " + dnaIndex + " and protein " + proteinIndex + " is a frameshift of length " + bestInsertionLength + " at " + bestInsertionIndex + " with similarity of about " + bestSimilarity);
     System.out.println("Original DNA: " + dna);
     System.out.println("Shifted  DNA: " + bestMutatedDNA);
     System.out.println("Translated  : " + translatedProtein);
