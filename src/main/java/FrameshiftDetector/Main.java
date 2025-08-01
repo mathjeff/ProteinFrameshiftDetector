@@ -53,9 +53,12 @@ public class Main {
       usage("Unrecognized argument '" + arg + "'");
     }
     System.out.println("\nThis program isn't optimized but hopefully is helpful\n");
-    for (String protein: proteins) {
-      for (String dna: dnas) {
-        System.out.println("Comparing " + dna + " and " + protein);
+    for (int i = 0; i < proteins.size(); i++) {
+      String protein = proteins.get(i);
+      for (int j = 0; j < dnas.size(); j++) {
+        String dna = dnas.get(j);
+        System.out.println("");
+        System.out.println("Comparing dnas[" + i + "] and proteins[" + j + "]");
         process(dna, protein);
       }
     }
@@ -107,8 +110,7 @@ public class Main {
         }
       }
     }
-    System.out.println("");
-    System.out.println("Most similar result is a frameshift of length " + bestInsertionLength + " at " + bestInsertionIndex + " with similarity of about " + bestSimilarity);
+    System.out.println("Most similar result for this pair of DNA and protein is a frameshift of length " + bestInsertionLength + " at " + bestInsertionIndex + " with similarity of about " + bestSimilarity);
     System.out.println("Original DNA: " + dna);
     System.out.println("Shifted  DNA: " + bestMutatedDNA);
     System.out.println("Translated  : " + dnaToProtein(bestMutatedDNA));
