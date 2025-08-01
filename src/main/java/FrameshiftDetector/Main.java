@@ -68,7 +68,7 @@ public class Main {
     int bestInsertionIndex = 0;
     int bestInsertionLength = 0;
     String bestMutatedDNA = "";
-    double bestSimilarity = 0;
+    double bestKmerMatchRate = 0;
     // check each possible frameshift
     for (int insertionLength = -2; insertionLength <= 2; insertionLength++) {
       int minIndex = Math.max(insertionLength, 2);
@@ -102,18 +102,23 @@ public class Main {
           similarityHigh = similarityMiddle;
         }
 
-        if (similarityMiddle > bestSimilarity) {
-          bestSimilarity = similarityMiddle;
+        if (similarityMiddle > bestKmerMatchRate) {
+          bestKmerMatchRate = similarityMiddle;
           bestInsertionIndex = middleIndex;
           bestInsertionLength = insertionLength;
           bestMutatedDNA = shiftedMiddle;
         }
       }
     }
+    // convert number of matching kmers to similarity
+    double kmerMatchRate = bestKmerMatchRate;
+    String translatedProtein = dnaToProtein(bestMutatedDNA);
+    double bestSimilarity = Math.pow(kmerMatchRate, 1.0 / (double)getKmerLength(protein, translatedProtein));
+
     System.out.println("Most similar result for this pair of DNA and protein is a frameshift of length " + bestInsertionLength + " at " + bestInsertionIndex + " with similarity of about " + bestSimilarity);
     System.out.println("Original DNA: " + dna);
     System.out.println("Shifted  DNA: " + bestMutatedDNA);
-    System.out.println("Translated  : " + dnaToProtein(bestMutatedDNA));
+    System.out.println("Translated  : " + translatedProtein);
     System.out.println("Protein     : " + protein);
   }
 
@@ -141,8 +146,8 @@ public class Main {
     return result;
   }
 
-  private static int getKmerLength(String protein) {
-    return logRoundUp(protein.length(), 20) + 2;
+  private static int getKmerLength(String protein1, String protein2) {
+    return logRoundUp(Math.max(protein1.length(), protein2.length()), 20) + 2;
   }
 
   private static double compareProteins(String a, String b) {
@@ -155,7 +160,7 @@ public class Main {
   private static double hashCompareProteins(String a, String b) {
     int numMatches = 0;
     int numMismatches = 0;
-    int kmerLength = getKmerLength(b);
+    int kmerLength = getKmerLength(a, b);
     List<String> kmersA = extractProteinKmers(a, kmerLength);
     Set<String> kmersB = new HashSet<String>(extractProteinKmers(b, kmerLength));
     for (String kmer: kmersA) {
