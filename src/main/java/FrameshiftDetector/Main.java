@@ -115,11 +115,38 @@ public class Main {
     String translatedProtein = dnaToProtein(bestMutatedDNA);
     double bestSimilarity = Math.pow(kmerMatchRate, 1.0 / (double)getKmerLength(protein, translatedProtein));
 
-    System.out.println("Most similar result for DNA " + dnaIndex + " and protein " + proteinIndex + " is a frameshift of length " + bestInsertionLength + " at " + bestInsertionIndex + " with similarity of about " + bestSimilarity);
-    System.out.println("Original DNA: " + dna);
-    System.out.println("Shifted  DNA: " + bestMutatedDNA);
-    System.out.println("Translated  : " + translatedProtein);
+    System.out.println("Most similar result for DNA " + dnaIndex + " (length " + dna.length() + ") and protein " + proteinIndex + " (length " + protein.length() + ") is a frameshift of length " + bestInsertionLength + " at " + bestInsertionIndex + " with similarity of about " + bestSimilarity);
+    boolean highlightFrameshift = dna.length() > 1000;
+    String displayDNA, displayShiftedDNA;
+    if (highlightFrameshift)
+      displayDNA = extractNeighborhood(dna, bestInsertionIndex / 3 * 3, protein.length() * 3);
+    else
+      displayDNA = dna;
+
+    if (highlightFrameshift)
+      displayShiftedDNA = extractNeighborhood(bestMutatedDNA, bestInsertionIndex / 3 * 3, protein.length() * 3);
+    else
+      displayShiftedDNA = dna;
+
+    if (highlightFrameshift)
+      System.out.println("Original DNA " + dnaIndex + " near " + bestInsertionIndex + ": " + displayDNA);
+    else
+      System.out.println("Original DNA: " + dna);
+    if (highlightFrameshift)
+      System.out.println("Shifted  DNA " + dnaIndex + " near " + bestInsertionIndex + ": " + displayShiftedDNA);
+    else
+      System.out.println("Shifted  DNA: " + bestMutatedDNA);
+    if (highlightFrameshift)
+      System.out.println("Translated near " + bestInsertionIndex + ": " + dnaToProtein(displayShiftedDNA));
+    else
+      System.out.println("Translated  : " + translatedProtein);
     System.out.println("Protein     : " + protein);
+  }
+
+  private static String extractNeighborhood(String text, int position, int radius) {
+    int startIndex = Math.max(position - radius, 0);
+    int endIndex = Math.min(position + radius, text.length());
+    return text.substring(startIndex, endIndex);
   }
 
 
