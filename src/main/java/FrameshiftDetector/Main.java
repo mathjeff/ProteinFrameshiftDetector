@@ -1,18 +1,22 @@
 package FrameshiftDetector;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Main {
   private static void usage(String error) {
     System.out.println(error);
-    System.out.println("Usage: java -jar ProteinFrameshiftDetector.jar <dna> <protein>");
+    System.out.println("Usage: java -jar ProteinFrameshiftDetector.jar [--dna <dna>] [--dnas <filepath> [--protein <protein>] [--proteins <filepath>]");
+    System.out.println("Looks for frameshifts in the given proteins to make them look like the given DNA");
     System.exit(1);
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     List<String> dnas = new ArrayList<String>();
     List<String> proteins = new ArrayList<String>();
     for (int i = 0; i < args.length; i++) {
@@ -22,12 +26,31 @@ public class Main {
         dnas.add(args[i]);
         continue;
       }
+      if (arg.equals("--dnas")) {
+        i++;
+        String filepath = args[i];
+        Map<String, String> sequences = FastaParser.parseFasta(new File(filepath));
+        for (String sequence: sequences.values()) {
+          dnas.add(sequence);
+        }
+        continue;
+      }
       if (arg.equals("--protein")) {
         i++;
         proteins.add(args[i]);
         continue;
       }
-      usage("Unrecognized argument '" + arg + "', expected --dna or --protein");
+      if (arg.equals("--proteins")) {
+        i++;
+        String filepath = args[i];
+        Map<String, String> sequences = FastaParser.parseFasta(new File(filepath));
+        for (String sequence: sequences.values()) {
+          proteins.add(sequence);
+        }
+        continue;
+      }
+
+      usage("Unrecognized argument '" + arg + "'");
     }
     System.out.println("\nThis program isn't optimized but hopefully is helpful\n");
     for (String protein: proteins) {
