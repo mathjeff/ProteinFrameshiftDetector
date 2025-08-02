@@ -31,7 +31,7 @@ Insertion of length 1bp at 29
 
 To get it, do one of these:
 
-* Download [a release](https://github.com/mathjeff/ProteinFrameshiftDetector/releases/) version for example [this one](https://github.com/mathjeff/ProteinFrameshiftDetector/releases/download/0.0.1/ProteinFrameshiftDetector.jar)
+* Download [a release](https://github.com/mathjeff/ProteinFrameshiftDetector/releases/) version for example [this one](https://github.com/mathjeff/ProteinFrameshiftDetector/releases/download/0.0.2/ProteinFrameshiftDetector.jar)
 
 * Build it yourself
 
