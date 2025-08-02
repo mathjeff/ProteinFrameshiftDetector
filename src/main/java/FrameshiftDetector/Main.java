@@ -95,6 +95,7 @@ public class Main {
       int startIndex = cumulativeLength;
       int endIndex = cumulativeLength + component.length();
       System.out.println("Trying to align " + proteinName + ".dna[" + startIndex + ":" + endIndex + "] = " + component);
+      System.out.println("Translated protein section: " + dnaToProtein(component));
       List<QueryAlignment> alignments = mapper.Api.align(component, reference, alignmentParameters(), Logger.NoOpLogger);
       if (alignments.size() < 1) {
         System.out.println("found no alignments");
