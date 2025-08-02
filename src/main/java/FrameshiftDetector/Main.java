@@ -77,11 +77,21 @@ public class Main {
     System.out.println("Original protein:" + protein);
     System.out.println("Protein to DNA: " + equivalentDNA);
     System.out.println("Original DNA: " + dna);
-    List<QueryAlignment> alignments = mapper.Api.alignOnce(equivalentDNA, dna, alignmentParameters(), Logger.NoOpLogger);
-    if (alignments.size() < 1) {
-      System.out.println("found no alignments");
-    } else {
-      System.out.println(alignments.get(0).format());
+    mapper.ReferenceDatabase reference = mapper.Api.newDatabase(dna, Logger.NoOpLogger);
+    // split dna into pieces to align in case of breaks
+    int numPieces = equivalentDNA.length() / 100 + 1;
+    int startIndex = 0;
+    for (int i = 1; i <= numPieces; i++) {
+      int endIndex = equivalentDNA.length() * i / numPieces;
+      String window = equivalentDNA.substring(startIndex, endIndex);
+      System.out.println("Trying to align convertedDNA[" + startIndex + ":" + endIndex + "]");
+      List<QueryAlignment> alignments = mapper.Api.align(window, reference, alignmentParameters(), Logger.NoOpLogger);
+      if (alignments.size() < 1) {
+        System.out.println("found no alignments");
+      } else {
+        System.out.println(alignments.get(0).format());
+      }
+      startIndex = endIndex;
     }
   }
 
