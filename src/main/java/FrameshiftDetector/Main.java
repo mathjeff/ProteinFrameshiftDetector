@@ -23,35 +23,42 @@ public class Main {
 
   public static void main(String[] args) throws IOException {
     List<String> dnas = new ArrayList<String>();
+    List<String> dnaNames = new ArrayList<String>();
     List<String> proteins = new ArrayList<String>();
+    List<String> proteinNames = new ArrayList<String>();
     for (int i = 0; i < args.length; i++) {
       String arg = args[i];
       if (arg.equals("--dna")) {
         i++;
         dnas.add(args[i]);
+        dnaNames.add("dna" + dnas.size());
         continue;
       }
       if (arg.equals("--dnas")) {
         i++;
         String filepath = args[i];
         Map<String, String> sequences = FastaParser.parseFasta(new File(filepath));
-        for (String sequence: sequences.values()) {
-          dnas.add(sequence);
+        for (Map.Entry<String, String> entry: sequences.entrySet()) {
+          dnas.add(entry.getValue());
+          dnaNames.add(entry.getKey());
         }
         continue;
       }
       if (arg.equals("--protein")) {
         i++;
         proteins.add(args[i]);
+        proteinNames.add("protein" + proteins.size());
         continue;
       }
       if (arg.equals("--proteins")) {
         i++;
         String filepath = args[i];
         Map<String, String> sequences = FastaParser.parseFasta(new File(filepath));
-        for (String sequence: sequences.values()) {
-          proteins.add(sequence);
+        for (Map.Entry<String, String> entry: sequences.entrySet()) {
+          proteins.add(entry.getValue());
+          proteinNames.add(entry.getKey());
         }
+
         continue;
       }
 
@@ -66,30 +73,35 @@ public class Main {
         System.out.println("Comparing dnas[" + i + "] and proteins[" + j + "]");
         System.out.println("DNA = " + dna);
         System.out.println("Protein = " + protein);
-        process(dna, j, protein, i);
+        process(dna, dnaNames.get(j), protein, proteinNames.get(i));
       }
     }
   }
 
-  private static void process(String dna, int dnaIndex, String protein, int proteinIndex) {
+  private static void process(String dna, String dnaName, String protein, String proteinName) {
     List<String> equivalentDNAComponents = convertProteinToDNAs(dna, protein);
     String equivalentDNA = String.join("", equivalentDNAComponents);
-    System.out.println("Converted protein " + proteinIndex + " to resemble dna " + dnaIndex);
+    System.out.println("Converted protein " + proteinName + " to resemble dna " + dnaName);
     System.out.println("Original protein:" + protein);
     System.out.println("Protein to DNA: " + equivalentDNA);
     System.out.println("Original DNA: " + dna);
-    mapper.ReferenceDatabase reference = mapper.Api.newDatabase(dna, Logger.NoOpLogger);
+    Map<String, String> namedDNA = new HashMap<String, String>();
+    namedDNA.put(dnaName, dna);
+    mapper.ReferenceDatabase reference = mapper.Api.newDatabase(namedDNA, Logger.NoOpLogger);
     // split dna into pieces to align in case of breaks
     int numPieces = equivalentDNA.length() / 150 + 1;
-    int startIndex = 0;
+    int cumulativeLength = 0;
     for (String component: equivalentDNAComponents) {
-      System.out.println("Trying to align " + component);
+      int startIndex = cumulativeLength;
+      int endIndex = cumulativeLength + component.length();
+      System.out.println("Trying to align " + proteinName + ".dna[" + startIndex + ":" + endIndex + "] = " + component);
       List<QueryAlignment> alignments = mapper.Api.align(component, reference, alignmentParameters(), Logger.NoOpLogger);
       if (alignments.size() < 1) {
         System.out.println("found no alignments");
       } else {
         System.out.println(alignments.get(0).format());
       }
+      cumulativeLength = endIndex;
     }
   }
 
