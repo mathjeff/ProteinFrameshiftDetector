@@ -89,7 +89,6 @@ public class Main {
     namedDNA.put(dnaName, dna);
     mapper.ReferenceDatabase reference = mapper.Api.newDatabase(namedDNA, Logger.NoOpLogger);
     // split dna into pieces to align in case of breaks
-    int numPieces = equivalentDNA.length() / 150 + 1;
     int cumulativeLength = 0;
     List<AlignedBlock> indels = new ArrayList<AlignedBlock>();
     for (String component: equivalentDNAComponents) {
