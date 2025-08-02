@@ -196,6 +196,7 @@ public class Codons
         result.add(new Codon("L", "TTG"));
         result.add(new Codon("F", "TTT"));
 
+        result.add(new Codon("?", "NNN"));
         return result;
     }
 }
