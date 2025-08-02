@@ -1,4 +1,4 @@
-ProteinFrameshiftDetector is a prototype project for finding a single small frameshift that explains the difference between a DNA sequence and a protein sequence
+ProteinFrameshiftDetector is a prototype project for finding frameshifts that explains the difference between a DNA sequence and a protein sequence
 
 To use it, do one of these:
 
