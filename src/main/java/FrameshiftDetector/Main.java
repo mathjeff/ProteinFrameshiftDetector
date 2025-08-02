@@ -102,7 +102,7 @@ public class Main {
     parameters.InsertionExtension_Penalty = 0.5;
     parameters.DeletionStart_Penalty = 2;
     parameters.DeletionExtension_Penalty = 0.5;
-    parameters.MaxErrorRate = 0.1;
+    parameters.MaxErrorRate = 0.3;
     parameters.AmbiguityPenalty = 0.1;
     parameters.UnalignedPenalty = 0.1;
     return parameters;
