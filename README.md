@@ -36,6 +36,7 @@ To get it, do one of these:
 * Build it yourself
 
 ```
+git submodule init && git submodule update
 ./gradlew shadowJar
 java -jar build/libs/ProteinFrameshiftDetector.jar --dna <DNASequence> --protein <ProteinSequence>
 ```
