@@ -1,24 +1,32 @@
 ProteinFrameshiftDetector is a prototype project for finding a single small frameshift that explains the difference between a DNA sequence and a protein sequence
 
-To use it, do this:
+To use it, do one of these:
 
 ```
-java -jar ProteinFrameshiftDetector.jar <DNASequence> <ProteinSequence>
+java -jar ProteinFrameshiftDetector.jar --dna <DNASequence> --protein <ProteinSequence>
+java -jar ProteinFrameshiftDetector.jar --dnas dnas.fasta --protein proteins.fasta
 ```
 
 For example:
 
 ```
-$ java -jar build/libs/ProteinFrameshiftDetector.jar ATGCGAGTGTGGAAGTTCGGCGGTACATCAGTGGCAAATGCAGAAGTTTTCTGCGGGTT MRVLKFGGTSVANAERFLRV
+ $ java -jar build/libs/ProteinFrameshiftDetector.jar --dna ATGCGAGTGTTGAAGTTCGGCGGTACATCAGGGCAAATGCAGAACGTTTTCTGCGGGTT --protein MRVLKFGGTSVANAERFLRV
 
-This program isn't optimized but hopefully is helpful
+Comparing dnas[0] and proteins[0]
+DNA = ATGCGAGTGTTGAAGTTCGGCGGTACATCAGGGCAAATGCAGAACGTTTTCTGCGGGTT
+Protein = MRVLKFGGTSVANAERFLRV
+Converted protein protein1 to resemble dna dna1
+Original protein:MRVLKFGGTSVANAERFLRV
+Protein to DNA: ATGCGAGTGTTGAAGTTCGGCGGTACATCANNNGCAAATGCAGAACGTTTTCTGCGGNNN
+Original DNA: ATGCGAGTGTTGAAGTTCGGCGGTACATCAGGGCAAATGCAGAACGTTTTCTGCGGGTT
+Trying to align protein1.dna[0:60] = ATGCGAGTGTTGAAGTTCGGCGGTACATCANNNGCAAATGCAGAACGTTTTCTGCGGNNN
+Translated protein[0:20]: MRVLKFGGTS?ANAERFLR?
+alignment at dna1 offset 0:
+TGCGAGTGTTGAAGTTCGGCGGTACATCANNNGCAAATGCAGAACGTTTTCTGCGGNNN
+TGCGAGTGTTGAAGTTCGGCGGTACATC-AGGGCAAATGCAGAACGTTTTCTGCGGGTT
 
-
-Most similar result is a frameshift of length 1 at 43 with similarity of about 0.6666666666666666
-Original DNA: ATGCGAGTGTGGAAGTTCGGCGGTACATCAGTGGCAAATGCAGAAGTTTTCTGCGGGTT
-Shifted  DNA: ATGCGAGTGTGGAAGTTCGGCGGTACATCAGTGGCAAATGCAGAAAGTTTTCTGCGGGTT
-Translated  : MRVWKFGGTSVANAESFLRV
-Protein     : MRVLKFGGTSVANAERFLRV
+Summary for protein1 compared to dna1:
+Insertion of length 1bp at 29
 ```
 
 To get it, do one of these:
@@ -28,6 +36,6 @@ To get it, do one of these:
 * Build it yourself
 
 ```
-./gradlew build
-java -jar build/libs/ProteinFrameshiftDetector.jar <DNASequence> <ProteinSequence>
+./gradlew shadowJar
+java -jar build/libs/ProteinFrameshiftDetector.jar --dna <DNASequence> --protein <ProteinSequence>
 ```

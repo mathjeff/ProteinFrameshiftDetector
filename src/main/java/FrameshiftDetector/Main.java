@@ -64,7 +64,6 @@ public class Main {
 
       usage("Unrecognized argument '" + arg + "'");
     }
-    System.out.println("\nThis program isn't optimized but hopefully is helpful\n");
     for (int i = 0; i < proteins.size(); i++) {
       String protein = proteins.get(i);
       for (int j = 0; j < dnas.size(); j++) {
