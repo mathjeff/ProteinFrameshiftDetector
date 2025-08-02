@@ -160,7 +160,7 @@ public class Main {
       if (proteinIndex + proteinKmerLength <= protein.length()) {
         proteinKmer = protein.substring(proteinIndex, proteinIndex + proteinKmerLength);
         dnaKmer = proteinToDNA.get(proteinKmer);
-        System.out.println("proteinKmer " + proteinKmer + " comes from dnaKmer " + dnaKmer);
+        //System.out.println("proteinKmer " + proteinKmer + " comes from dnaKmer " + dnaKmer);
       }
       if (dnaKmer != null) {
         // we got a unique match, so we can add another codon
@@ -217,10 +217,10 @@ public class Main {
       String dnaKmer = gene.substring(i, i + dnaKmerLength);
       String proteinKmer = dnaToProtein(dnaKmer);
       if (results.containsKey(proteinKmer) && !dnaKmer.equals(results.get(proteinKmer))) {
-        System.out.println("proteinKmer " + proteinKmer + " comes from " + dnaKmer + ": conflict");
+        //System.out.println("proteinKmer " + proteinKmer + " comes from " + dnaKmer + ": conflict");
         results.put(proteinKmer, null); // multiple dna kmers for the same protein kmer
       } else {
-        System.out.println("proteinKmer " + proteinKmer + " comes from " + dnaKmer + ": unique so far");
+        //System.out.println("proteinKmer " + proteinKmer + " comes from " + dnaKmer + ": unique so far");
         results.put(proteinKmer, dnaKmer);
       }
     }
