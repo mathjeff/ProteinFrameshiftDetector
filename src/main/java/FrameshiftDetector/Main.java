@@ -8,6 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import mapper.AlignmentParameters;
+import mapper.Logger;
+import mapper.QueryAlignment;
+import mapper.QueryAlignment;
 
 public class Main {
   private static void usage(String error) {
@@ -73,6 +77,25 @@ public class Main {
     System.out.println("Original protein:" + protein);
     System.out.println("Protein to DNA: " + equivalentDNA);
     System.out.println("Original DNA: " + dna);
+    List<QueryAlignment> alignments = mapper.Api.alignOnce(equivalentDNA, dna, alignmentParameters(), Logger.NoOpLogger);
+    if (alignments.size() < 1) {
+      System.out.println("found no alignments");
+    } else {
+      System.out.println(alignments.get(0).format());
+    }
+  }
+
+  private static AlignmentParameters alignmentParameters() {
+    AlignmentParameters parameters = new AlignmentParameters();
+    parameters.MutationPenalty = 1;
+    parameters.InsertionStart_Penalty = 2;
+    parameters.InsertionExtension_Penalty = 0.5;
+    parameters.DeletionStart_Penalty = 2;
+    parameters.DeletionExtension_Penalty = 0.5;
+    parameters.MaxErrorRate = 0.1;
+    parameters.AmbiguityPenalty = 0.1;
+    parameters.UnalignedPenalty = 0.1;
+    return parameters;
   }
 
   private static String extractNeighborhood(String text, int position, int radius) {
