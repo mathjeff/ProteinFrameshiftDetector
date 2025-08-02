@@ -137,9 +137,13 @@ public class Main {
     else
       System.out.println("Shifted  DNA: " + bestMutatedDNA);
     if (highlightFrameshift)
-      System.out.println("Translated near " + bestInsertionIndex + ": " + dnaToProtein(displayShiftedDNA));
+      System.out.println("This nearby DNA translated: " + dnaToProtein(displayDNA));
     else
-      System.out.println("Translated  : " + translatedProtein);
+      System.out.println("Original DNA translated: " + dnaToProtein(displayDNA));
+    if (highlightFrameshift)
+      System.out.println("Shifted DNA translated near " + bestInsertionIndex + ": " + dnaToProtein(displayShiftedDNA));
+    else
+      System.out.println("Shifted DNA translated  : " + translatedProtein);
     System.out.println("Protein     : " + protein);
   }
 
