@@ -3,6 +3,7 @@ package FrameshiftDetector;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -59,93 +60,19 @@ public class Main {
         String dna = dnas.get(j);
         System.out.println("");
         System.out.println("Comparing dnas[" + i + "] and proteins[" + j + "]");
+        System.out.println("DNA = " + dna);
+        System.out.println("Protein = " + protein);
         process(dna, j, protein, i);
       }
     }
   }
 
   private static void process(String dna, int dnaIndex, String protein, int proteinIndex) {
-    int bestInsertionIndex = 0;
-    int bestInsertionLength = 0;
-    String bestMutatedDNA = "";
-    double bestKmerMatchRate = 0;
-    // check each possible frameshift
-    for (int insertionLength = -2; insertionLength <= 2; insertionLength++) {
-      int minIndex = Math.max(insertionLength, 2);
-      int maxIndex = Math.min(dna.length() - insertionLength, dna.length());
-
-      String shiftedLow = addFrameshift(dna, minIndex, insertionLength);
-      String translatedLow = dnaToProtein(shiftedLow);
-      double similarityLow = compareProteins(protein, translatedLow);
-
-      String shiftedHigh = addFrameshift(dna, maxIndex, insertionLength);
-      String translatedHigh = dnaToProtein(shiftedHigh);
-      double similarityHigh = compareProteins(protein, translatedHigh);
-
-      // binary search to find the best position to put this frameshift
-      while (maxIndex > minIndex + 1) {
-        int middleIndex = (maxIndex + minIndex) / 2;
-
-        String shiftedMiddle = addFrameshift(dna, middleIndex, insertionLength);
-        String translatedMiddle = dnaToProtein(shiftedMiddle);
-        double similarityMiddle = compareProteins(protein, translatedMiddle);
-
-        if (similarityLow < similarityHigh) {
-          minIndex = middleIndex;
-          shiftedLow = shiftedMiddle;
-          translatedLow = translatedMiddle;
-          similarityLow = similarityMiddle;
-        } else {
-          minIndex = middleIndex;
-          shiftedHigh = shiftedMiddle;
-          translatedHigh = translatedMiddle;
-          similarityHigh = similarityMiddle;
-        }
-
-        if (similarityMiddle > bestKmerMatchRate) {
-          bestKmerMatchRate = similarityMiddle;
-          bestInsertionIndex = middleIndex;
-          bestInsertionLength = insertionLength;
-          bestMutatedDNA = shiftedMiddle;
-        }
-      }
-    }
-    // convert number of matching kmers to similarity
-    double kmerMatchRate = bestKmerMatchRate;
-    String translatedProtein = dnaToProtein(bestMutatedDNA);
-    double bestSimilarity = Math.pow(kmerMatchRate, 1.0 / (double)getKmerLength(protein, translatedProtein));
-
-    System.out.println("Most similar result for DNA " + dnaIndex + " (length " + dna.length() + ") and protein " + proteinIndex + " (length " + protein.length() + ") is a frameshift of length " + bestInsertionLength + " at " + bestInsertionIndex + " with similarity of about " + bestSimilarity);
-    boolean highlightFrameshift = dna.length() > 1000;
-    String displayDNA, displayShiftedDNA;
-    int neighborhoodRadiusAminos = 100;
-    if (highlightFrameshift)
-      displayDNA = extractNeighborhood(dna, bestInsertionIndex / 3 * 3, neighborhoodRadiusAminos * 3);
-    else
-      displayDNA = dna;
-
-    if (highlightFrameshift)
-      displayShiftedDNA = extractNeighborhood(bestMutatedDNA, bestInsertionIndex / 3 * 3, neighborhoodRadiusAminos * 3);
-    else
-      displayShiftedDNA = dna;
-
-    if (highlightFrameshift)
-      System.out.println("Original DNA " + dnaIndex + " near " + bestInsertionIndex + ": " + displayDNA);
-    else
-      System.out.println("Original DNA: " + dna);
-    if (highlightFrameshift)
-      System.out.println("Shifted  DNA " + dnaIndex + " near " + bestInsertionIndex + ": " + displayShiftedDNA);
-    else
-      System.out.println("Shifted  DNA: " + bestMutatedDNA);
-    if (highlightFrameshift)
-      System.out.println("This nearby DNA translated: " + dnaToProtein(displayDNA));
-    else
-      System.out.println("Original DNA translated: " + dnaToProtein(displayDNA));
-    if (highlightFrameshift)
-      System.out.println("Shifted DNA translated near " + bestInsertionIndex + ": " + dnaToProtein(displayShiftedDNA));
-    else
-      System.out.println("Shifted DNA translated  : " + translatedProtein);
-    System.out.println("Protein     : " + protein);
+    String equivalentDNA = convertProteinToDNA(dna, protein);
+    System.out.println("Converted protein " + proteinIndex + " to resemble dna " + dnaIndex);
+    System.out.println("Original protein:" + protein);
+    System.out.println("Protein to DNA: " + equivalentDNA);
+    System.out.println("Original DNA: " + dna);
   }
 
   private static String extractNeighborhood(String text, int position, int radius) {
@@ -178,44 +105,69 @@ public class Main {
     return result;
   }
 
-  private static int getKmerLength(String protein1, String protein2) {
-    return logRoundUp(Math.max(protein1.length(), protein2.length()), 20) + 2;
+  private static int getKmerLength(String gene) {
+    return logRoundUp(gene.length(), 20) + 2;
   }
 
-  private static double compareProteins(String a, String b) {
-    if (a.length() < b.length())
-      return hashCompareProteins(a, b);
-    else
-      return hashCompareProteins(b, a);
-  }
+  private static String convertProteinToDNA(String gene, String protein) {
+    // generate proteins for each frameshift
+    String gene0 = gene;
+    String gene1 = addFrameshift(gene0, 0, 1);
+    String gene2 = addFrameshift(gene0, 0, 2);
 
-  private static double hashCompareProteins(String a, String b) {
-    int numMatches = 0;
-    int numMismatches = 0;
-    int kmerLength = getKmerLength(a, b);
-    List<String> kmersA = extractProteinKmers(a, kmerLength);
-    Set<String> kmersB = new HashSet<String>(extractProteinKmers(b, kmerLength));
-    for (String kmer: kmersA) {
-      if (kmersB.contains(kmer)) {
-        numMatches++;
+    // keep track of which protein kmers correspond to which DNA kmers
+    int proteinKmerLength = getKmerLength(gene);
+    Map<String, String> proteinToDNA = new HashMap<String, String>();
+    collectProteinToDNA(gene0, proteinKmerLength, proteinToDNA);
+    collectProteinToDNA(gene1, proteinKmerLength, proteinToDNA);
+    collectProteinToDNA(gene2, proteinKmerLength, proteinToDNA);
+
+    // attempt to convert protein kmers to DNA kmers
+    StringBuilder equivalentDNA = new StringBuilder();
+    String pendingDNAKmer = null;
+    for (int proteinIndex = 0; proteinIndex < protein.length(); proteinIndex++) {
+      String proteinKmer = null;
+      String dnaKmer = null;
+      if (proteinIndex + proteinKmerLength <= protein.length()) {
+        proteinKmer = protein.substring(proteinIndex, proteinIndex + proteinKmerLength);
+        dnaKmer = proteinToDNA.get(proteinKmer);
+        System.out.println("proteinKmer " + proteinKmer + " comes from dnaKmer " + dnaKmer);
+      }
+      if (dnaKmer != null) {
+        // we got a unique match, so we can add another codon
+        equivalentDNA.append(dnaKmer.substring(0, 3));
+        pendingDNAKmer = dnaKmer.substring(3);
       } else {
-        numMismatches++;
+        if (pendingDNAKmer != null && pendingDNAKmer.length() >= 3) {
+          // We didn't get a unique match but we can reuse the previous DNA kmer
+          equivalentDNA.append(pendingDNAKmer.substring(0, 3));
+          pendingDNAKmer = pendingDNAKmer.substring(3);
+        } else {
+          // We aren't sure what the DNA should be here
+          equivalentDNA.append("NNN");
+        }
       }
     }
-    double similarity = (double)numMatches / (double)(numMatches + numMismatches);
-    //System.out.println("Compared " + a + " and " + b + " and got " + similarity);
-    return similarity;
+    return equivalentDNA.toString();
   }
 
-  private static List<String> extractProteinKmers(String protein, int length) {
-    List<String> kmers = new ArrayList<String>();
-    int maxIndex = protein.length() - length + 1;
-    for (int i = 0; i < maxIndex; i++) {
-      String kmer = protein.substring(i, i + length);
-      kmers.add(kmer);
+  private static void collectProteinToDNA(String gene, int proteinKmerLength, Map<String, String> results) {
+    int dnaKmerLength = proteinKmerLength * 3;
+
+    String protein = dnaToProtein(gene);
+    int max = gene.length() - dnaKmerLength;
+
+    for (int i = 0; i < max; i += 3) {
+      String dnaKmer = gene.substring(i, i + dnaKmerLength);
+      String proteinKmer = dnaToProtein(dnaKmer);
+      if (results.containsKey(proteinKmer) && !dnaKmer.equals(results.get(proteinKmer))) {
+        System.out.println("proteinKmer " + proteinKmer + " comes from " + dnaKmer + ": conflict");
+        results.put(proteinKmer, null); // multiple dna kmers for the same protein kmer
+      } else {
+        System.out.println("proteinKmer " + proteinKmer + " comes from " + dnaKmer + ": unique so far");
+        results.put(proteinKmer, dnaKmer);
+      }
     }
-    //System.out.println("extracted " + kmers.size() + " kmers of length " + length);
-    return kmers;
   }
 
 }

@@ -103,6 +103,8 @@ public class Codons
         {
             String codonText = dna.substring(i, i + 3);
             Codon codon = Codons.getCodonsByDNA().get(codonText);
+            if (codon == null)
+              throw new IllegalArgumentException("Cannot find codon with text " + codonText + " from text " + dna);
             String amino = codon.getProtein();
             if (!amino.equals(stop))
             {
