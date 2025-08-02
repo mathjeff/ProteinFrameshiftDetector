@@ -79,7 +79,7 @@ public class Main {
     System.out.println("Original DNA: " + dna);
     mapper.ReferenceDatabase reference = mapper.Api.newDatabase(dna, Logger.NoOpLogger);
     // split dna into pieces to align in case of breaks
-    int numPieces = equivalentDNA.length() / 100 + 1;
+    int numPieces = equivalentDNA.length() / 150 + 1;
     int startIndex = 0;
     for (int i = 1; i <= numPieces; i++) {
       int endIndex = equivalentDNA.length() * i / numPieces;
