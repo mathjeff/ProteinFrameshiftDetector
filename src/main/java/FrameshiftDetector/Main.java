@@ -137,6 +137,9 @@ public class Main {
     String gene0 = gene;
     String gene1 = addFrameshift(gene0, 0, 1);
     String gene2 = addFrameshift(gene0, 0, 2);
+    String gene0Comp = reverseComplementDNA(gene0);
+    String gene1Comp = addFrameshift(gene0Comp, 0, 1);
+    String gene2Comp = addFrameshift(gene0Comp, 0, 2);
 
     // keep track of which protein kmers correspond to which DNA kmers
     int proteinKmerLength = getKmerLength(gene);
@@ -144,6 +147,9 @@ public class Main {
     collectProteinToDNA(gene0, proteinKmerLength, proteinToDNA);
     collectProteinToDNA(gene1, proteinKmerLength, proteinToDNA);
     collectProteinToDNA(gene2, proteinKmerLength, proteinToDNA);
+    collectProteinToDNA(gene0Comp, proteinKmerLength, proteinToDNA);
+    collectProteinToDNA(gene1Comp, proteinKmerLength, proteinToDNA);
+    collectProteinToDNA(gene2Comp, proteinKmerLength, proteinToDNA);
 
     // attempt to convert protein kmers to DNA kmers
     StringBuilder equivalentDNA = new StringBuilder();
@@ -172,6 +178,33 @@ public class Main {
       }
     }
     return equivalentDNA.toString();
+  }
+
+  private static String reverseComplementDNA(String text) {
+    StringBuilder builder = new StringBuilder();
+    for (int i = text.length() - 1; i >= 0; i--) {
+      char here = text.charAt(i);
+      char complement;
+      if (here == 'A') {
+        complement = 'T';
+      } else {
+        if (here == 'C') {
+          complement = 'G';
+        } else {
+          if (here == 'G') {
+            complement = 'C';
+          } else {
+            if (here == 'T') {
+              complement = 'A';
+            } else {
+              complement = here;
+            }
+          }
+        }
+      }
+      builder.append(complement);
+    }
+    return builder.toString();
   }
 
   private static void collectProteinToDNA(String gene, int proteinKmerLength, Map<String, String> results) {
