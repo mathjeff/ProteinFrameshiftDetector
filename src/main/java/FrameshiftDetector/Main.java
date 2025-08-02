@@ -72,7 +72,8 @@ public class Main {
   }
 
   private static void process(String dna, int dnaIndex, String protein, int proteinIndex) {
-    String equivalentDNA = convertProteinToDNA(dna, protein);
+    List<String> equivalentDNAComponents = convertProteinToDNAs(dna, protein);
+    String equivalentDNA = String.join("", equivalentDNAComponents);
     System.out.println("Converted protein " + proteinIndex + " to resemble dna " + dnaIndex);
     System.out.println("Original protein:" + protein);
     System.out.println("Protein to DNA: " + equivalentDNA);
@@ -81,17 +82,14 @@ public class Main {
     // split dna into pieces to align in case of breaks
     int numPieces = equivalentDNA.length() / 150 + 1;
     int startIndex = 0;
-    for (int i = 1; i <= numPieces; i++) {
-      int endIndex = equivalentDNA.length() * i / numPieces;
-      String window = equivalentDNA.substring(startIndex, endIndex);
-      System.out.println("Trying to align convertedDNA[" + startIndex + ":" + endIndex + "]");
-      List<QueryAlignment> alignments = mapper.Api.align(window, reference, alignmentParameters(), Logger.NoOpLogger);
+    for (String component: equivalentDNAComponents) {
+      System.out.println("Trying to align " + component);
+      List<QueryAlignment> alignments = mapper.Api.align(component, reference, alignmentParameters(), Logger.NoOpLogger);
       if (alignments.size() < 1) {
         System.out.println("found no alignments");
       } else {
         System.out.println(alignments.get(0).format());
       }
-      startIndex = endIndex;
     }
   }
 
@@ -142,7 +140,8 @@ public class Main {
     return logRoundUp(gene.length(), 20) + 2;
   }
 
-  private static String convertProteinToDNA(String gene, String protein) {
+  // converts a protein into DNA and breaks it at the positions where we're less confident of what it should be
+  private static List<String> convertProteinToDNAs(String gene, String protein) {
     // generate proteins for each frameshift
     String gene0 = gene;
     String gene1 = addFrameshift(gene0, 0, 1);
@@ -162,6 +161,7 @@ public class Main {
     collectProteinToDNA(gene2Comp, proteinKmerLength, proteinToDNA);
 
     // attempt to convert protein kmers to DNA kmers
+    List<String> components = new ArrayList<String>();
     StringBuilder equivalentDNA = new StringBuilder();
     String pendingDNAKmer = null;
     for (int proteinIndex = 0; proteinIndex < protein.length(); proteinIndex++) {
@@ -177,6 +177,12 @@ public class Main {
         equivalentDNA.append(dnaKmer.substring(0, 3));
         pendingDNAKmer = dnaKmer.substring(3);
       } else {
+        // We didn't get a unique match, so this is a good place to break
+        if (equivalentDNA.length() >= 99) {
+          components.add(equivalentDNA.toString());
+          equivalentDNA = new StringBuilder();
+        }
+
         if (pendingDNAKmer != null && pendingDNAKmer.length() >= 3) {
           // We didn't get a unique match but we can reuse the previous DNA kmer
           equivalentDNA.append(pendingDNAKmer.substring(0, 3));
@@ -187,7 +193,10 @@ public class Main {
         }
       }
     }
-    return equivalentDNA.toString();
+    if (equivalentDNA.length() > 0) {
+      components.add(equivalentDNA.toString());
+    }
+    return components;
   }
 
   private static String reverseComplementDNA(String text) {
