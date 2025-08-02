@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import mapper.AlignmentParameters;
+import mapper.AlignedBlock;
 import mapper.Logger;
-import mapper.QueryAlignment;
 import mapper.QueryAlignment;
 
 public class Main {
@@ -91,6 +91,7 @@ public class Main {
     // split dna into pieces to align in case of breaks
     int numPieces = equivalentDNA.length() / 150 + 1;
     int cumulativeLength = 0;
+    List<AlignedBlock> indels = new ArrayList<AlignedBlock>();
     for (String component: equivalentDNAComponents) {
       int startIndex = cumulativeLength;
       int endIndex = cumulativeLength + component.length();
@@ -100,9 +101,26 @@ public class Main {
       if (alignments.size() < 1) {
         System.out.println("found no alignments");
       } else {
-        System.out.println(alignments.get(0).format());
+        QueryAlignment alignment = alignments.get(0);
+        System.out.println(alignment.format());
+        for (AlignedBlock block: alignment.getComponent(0).getSections()) {
+          if (block.getIndelLength() != 0)
+            indels.add(block);
+        }
       }
       cumulativeLength = endIndex;
+    }
+    if (indels.size() < 1) {
+      System.out.println("Summary for " + proteinName + " compared to " + dnaName + ": no indels");
+    } else {
+      System.out.println("Summary for " + proteinName + " compared to " + dnaName + ":");
+      for (AlignedBlock block: indels) {
+        if (block.getLengthA() > 0) {
+          System.out.println("Insertion of length " + block.getLengthA() + "bp at " + block.getStartIndexB());
+        } else {
+          System.out.println("Deletion of length " + block.getLengthA() + "bp at " + block.getStartIndexB());
+        }
+      }
     }
   }
 
