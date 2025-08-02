@@ -108,7 +108,7 @@ public class Main {
 
   private static AlignmentParameters alignmentParameters() {
     AlignmentParameters parameters = new AlignmentParameters();
-    parameters.MutationPenalty = 1;
+    parameters.MutationPenalty = 5;
     parameters.InsertionStart_Penalty = 2;
     parameters.InsertionExtension_Penalty = 0.5;
     parameters.DeletionStart_Penalty = 2;
