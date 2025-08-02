@@ -118,13 +118,14 @@ public class Main {
     System.out.println("Most similar result for DNA " + dnaIndex + " (length " + dna.length() + ") and protein " + proteinIndex + " (length " + protein.length() + ") is a frameshift of length " + bestInsertionLength + " at " + bestInsertionIndex + " with similarity of about " + bestSimilarity);
     boolean highlightFrameshift = dna.length() > 1000;
     String displayDNA, displayShiftedDNA;
+    int neighborhoodRadiusAminos = 100;
     if (highlightFrameshift)
-      displayDNA = extractNeighborhood(dna, bestInsertionIndex / 3 * 3, protein.length() * 3);
+      displayDNA = extractNeighborhood(dna, bestInsertionIndex / 3 * 3, neighborhoodRadiusAminos * 3);
     else
       displayDNA = dna;
 
     if (highlightFrameshift)
-      displayShiftedDNA = extractNeighborhood(bestMutatedDNA, bestInsertionIndex / 3 * 3, protein.length() * 3);
+      displayShiftedDNA = extractNeighborhood(bestMutatedDNA, bestInsertionIndex / 3 * 3, neighborhoodRadiusAminos * 3);
     else
       displayShiftedDNA = dna;
 
