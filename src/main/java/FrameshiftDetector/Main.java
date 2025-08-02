@@ -118,7 +118,7 @@ public class Main {
         if (block.getLengthA() > 0) {
           System.out.println("Insertion of length " + block.getLengthA() + "bp at " + block.getStartIndexB());
         } else {
-          System.out.println("Deletion of length " + block.getLengthA() + "bp at " + block.getStartIndexB());
+          System.out.println("Deletion of length " + block.getLengthB() + "bp at " + block.getStartIndexB());
         }
       }
     }
@@ -128,7 +128,7 @@ public class Main {
     AlignmentParameters parameters = new AlignmentParameters();
     parameters.MutationPenalty = 5;
     parameters.InsertionStart_Penalty = 2;
-    parameters.InsertionExtension_Penalty = 0.5;
+    parameters.InsertionExtension_Penalty = 5;
     parameters.DeletionStart_Penalty = 2;
     parameters.DeletionExtension_Penalty = 0.5;
     parameters.MaxErrorRate = 0.3;
